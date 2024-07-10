@@ -8,10 +8,10 @@ import { adminOnly } from "../middlewares/authHandler";
 
 const router = Router();
 
-router.get("/", adminOnly, getCustomers);
+router.get("/", getCustomers);
 
 router
   .get("/:id", adminOnly, getCustomer)
-  .delete("/:id", adminOnly, deleteCustomer);
+  .delete("/:id", deleteCustomer);
 
 export default router;
