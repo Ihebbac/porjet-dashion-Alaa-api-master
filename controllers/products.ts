@@ -149,28 +149,28 @@ export const getProducts = asyncHandler(async (req, res, next) => {
     skip,
     take,
     where: {
-      AND: [
-        {
-          AND: [
-            {
-              price: price[0],
-            },
-            {
-              price: price[1],
-            },
-          ],
-        },
-        {
-          AND: [
-            {
-              stock: stock[0],
-            },
-            {
-              stock: stock[1],
-            },
-          ],
-        },
-      ],
+      // AND: [
+      //   {
+      //     AND: [
+      //       {
+      //         price: price[0],
+      //       },
+      //       {
+      //         price: price[1],
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     AND: [
+      //       {
+      //         stock: stock[0],
+      //       },
+      //       {
+      //         stock: stock[1],
+      //       },
+      //     ],
+      //   },
+      // ],
       categoryId: {
         equals: categoryId,
       },
@@ -366,22 +366,11 @@ export const createProduct = asyncHandler(async (req, res, next) => {
     data: {
       // id, // only for testing
       name,
-      price,
-      discountPercent,
       description,
       detail,
       category: {
         connect: { id: categoryId },
       },
-      image1,
-      image2,
-      stock,
-      // tags: {
-      //   create: [{ name: "trendy" }],
-      // },
-      // categories: {
-      //   create: [{ name: 'Magic' }, { name: 'Butterflies' }],
-      // },
     },
   });
 
@@ -450,10 +439,6 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     where: { id },
     data: {
       name: name ? name : existingProduct?.name,
-      price: price ? price : existingProduct?.price,
-      discountPercent: discountPercent
-        ? discountPercent
-        : existingProduct?.discountPercent,
       description: description ? description : existingProduct?.description,
       detail: detail ? detail : existingProduct?.detail,
       category: {
@@ -461,9 +446,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
           id: categoryId ? categoryId : existingProduct?.categoryId,
         },
       },
-      image1: image1 ? image1 : existingProduct?.image1,
-      image2: image2 ? image2 : existingProduct?.image2,
-      stock: stock ? stock : existingProduct?.stock,
+
       updatedAt: new Date().toISOString(),
     },
   });

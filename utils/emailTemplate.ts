@@ -3,13 +3,13 @@ const emailTemplate = (
   total: number,
   deliveryAddress: string,
   deliveryDate: string,
-  items: { name: string; price: string; qty: number }[]
+  items: { name: string; qty: number }[]
 ) => {
   const itemRows = items.map(
     (item) =>
       `<tr>
         <td width="75%" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;"> ${item.name} (${item.qty}) </td>
-        <td width="25%" align="right" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding: 15px 10px 5px 10px;"> $${item.price} </td>
+        
     </tr>`
   );
   return `

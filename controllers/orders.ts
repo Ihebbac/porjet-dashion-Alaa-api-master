@@ -192,7 +192,6 @@ export const createOrder = asyncHandler(async (req, res, next) => {
       const items = createdOrderDetail.map((orderItem) => ({
         name: orderItem.product.name,
         qty: orderItem.quantity,
-        price: "" + orderItem.product.price,
       }));
 
       // invoke emailTemplate function and
