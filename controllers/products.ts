@@ -187,10 +187,15 @@ export const getProducts = asyncHandler(async (req, res, next) => {
     // include: { category: true },
   });
 
+  const proOptions = await prisma.proOptions.findMany();
+
   res.status(200).json({
     success: true,
     count: products.length,
-    data: products,
+    data: products.map((el: any) => ({
+      ...el,
+      option: proOptions.filter((elm) => elm?.productId === el?.id),
+    })),
   });
 });
 
@@ -289,9 +294,14 @@ export const getProduct = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(resource404Error("product"), 404));
   }
 
+  const proOptions = await prisma.proOptions.findMany();
+
   res.status(200).json({
     success: true,
-    data: product,
+    data: {
+      ...product,
+      option: proOptions.filter((elm) => elm.productId === product.id),
+    },
   });
 });
 
@@ -301,83 +311,92 @@ export const getProduct = asyncHandler(async (req, res, next) => {
  * @access  Private
  */
 export const createProduct = asyncHandler(async (req, res, next) => {
-  type RequiredFieldsType = {
-    name: string | undefined;
-    price: string | undefined;
-    description: string | undefined;
-    image1: string | undefined;
-    image2: string | undefined;
-  };
+  try {
+    type RequiredFieldsType = {
+      name: string | undefined;
+      description: string | undefined;
+      categoryId: string | undefined;
+    };
 
-  let {
-    name,
-    price,
-    description,
-    image1,
-    image2,
-    discountPercent,
-    detail,
-    categoryId,
-    stock,
-  } = req.body;
+    let { name, description, detail, categoryId, option: options } = req.body;
 
-  const requiredFields: RequiredFieldsType = {
-    name,
-    price,
-    description,
-    image1,
-    image2,
-  };
-
-  // Throws error if required field is not specified
-  const hasError = checkRequiredFields(requiredFields, next);
-  if (hasError !== false) return hasError;
-
-  // Throws error if price field is not number or negative number
-  if (!parseFloat(price) || parseFloat(price) < 0) {
-    return next(new ErrorResponse(invalidPriceError, 400));
-  }
-
-  // Throws error if stock field is not integer
-  if (stock) {
-    if (stock && !isIntegerAndPositive(stock)) {
-      return next(new ErrorResponse(invalidStockError, 400));
-    }
-    stock = parseInt(stock);
-  }
-
-  // Throws error if categoryId is invalid
-  if (categoryId) {
-    const category = await prisma.category.findUnique({
-      where: { id: parseInt(categoryId) },
-    });
-    if (!category) {
-      return next(new ErrorResponse(invalidCategoryError(categoryId), 400));
-    }
-    categoryId = parseInt(categoryId);
-  }
-
-  // let id: any;
-  // if (process.env.NODE_ENV === "testing") {
-  //   id = parseInt(req.body.id);
-  // }
-
-  const product = await prisma.product.create({
-    data: {
-      // id, // only for testing
+    const requiredFields: RequiredFieldsType = {
       name,
       description,
-      detail,
-      category: {
-        connect: { id: categoryId },
-      },
-    },
-  });
+      categoryId,
+    };
 
-  res.status(201).json({
-    success: true,
-    data: product,
-  });
+    // Throws error if required field is not specified
+    const hasError = checkRequiredFields(requiredFields, next);
+    if (hasError !== false) return hasError;
+
+    // Throws error if price field is not number or negative number
+    // if (!parseFloat(price) || parseFloat(price) < 0) {
+    //   return next(new ErrorResponse(invalidPriceError, 400));
+    // }
+
+    // Throws error if stock field is not integer
+    // if (stock) {
+    //   if (stock && !isIntegerAndPositive(stock)) {
+    //     return next(new ErrorResponse(invalidStockError, 400));
+    //   }
+    //   stock = parseInt(stock);
+    // }
+
+    // Throws error if categoryId is invalid
+    if (categoryId) {
+      const category = await prisma.category.findUnique({
+        where: { id: parseInt(categoryId) },
+      });
+      if (!category) {
+        return next(new ErrorResponse(invalidCategoryError(categoryId), 400));
+      }
+      categoryId = parseInt(categoryId);
+    }
+
+    // let id: any;
+    // if (process.env.NODE_ENV === "testing") {
+    //   id = parseInt(req.body.id);
+    // }
+
+    const product = await prisma.product.create({
+      data: {
+        // id, // only for testing
+        name,
+        description,
+        detail,
+        category: {
+          connect: { id: categoryId },
+        },
+      },
+    });
+    options.forEach(async (option: any) => {
+      await prisma.proOptions.create({
+        data: {
+          // id, // only for testing
+          color: option.colors,
+          images: option.images,
+          price: option.price,
+          size: option.sizes,
+          stock: option.stock,
+          product: {
+            connect: { id: product.id },
+          },
+        },
+      });
+    });
+
+    res.status(201).json({
+      success: true,
+      data: product,
+    });
+  } catch (error) {
+    console.log("eeeeeeeeeee", error);
+
+    res.status(500).json({
+      success: false,
+    });
+  }
 });
 
 /**

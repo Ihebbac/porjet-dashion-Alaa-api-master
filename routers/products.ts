@@ -16,11 +16,11 @@ router
   .get("/", getProducts)
   .get("/count", getProductCount)
   .get("/search", searchProducts)
-  .post("/", adminOnly, createProduct);
+  .post("/", createProduct);
 
 router
   .get("/:id", getProduct)
-  .put("/:id", adminOnly, updateProduct)
-  .delete("/:id", adminOnly, deleteProduct);
+  .put("/:id", updateProduct)
+  .delete("/:id", deleteProduct);
 
 export default router;
