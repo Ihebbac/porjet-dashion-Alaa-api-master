@@ -41,6 +41,7 @@
     "express-rate-limit": "^5.4.1",
     "helmet": "^4.6.0",
     "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.6.5"
   },
   "devDependencies": {
@@ -51,6 +52,7 @@
     "@types/jest": "^27.0.2",
     "@types/jsonwebtoken": "^8.5.5",
     "@types/morgan": "^1.9.3",
+    "@types/multer": "^1.4.11",
     "@types/node": "^16.10.1",
     "@types/nodemailer": "^6.4.4",
     "@types/supertest": "^2.0.11",

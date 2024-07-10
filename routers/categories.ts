@@ -10,12 +10,12 @@ import { adminOnly } from "../middlewares/authHandler";
 
 const router = Router();
 
-router.route("/").get(getCategories).post(adminOnly, createCategory);
-
+// router.route("/").get(getCategories).post(adminOnly, createCategory);
+router.route("/").get(getCategories).post(createCategory);
 router
   .route("/:id")
   .get(getCategory)
-  .put(adminOnly, updateCategory)
-  .delete(adminOnly, deleteCategory);
+  .put(updateCategory)
+  .delete(deleteCategory);
 
 export default router;

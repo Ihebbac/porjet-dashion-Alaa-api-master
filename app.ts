@@ -14,6 +14,10 @@ import customers from "./routers/customers";
 import admins from "./routers/admins";
 import auth from "./routers/auth";
 import orders from "./routers/orders";
+import uploadMiddleware from "./middlewares/multerMid";
+import fs from "fs";
+
+const pathimg = "./uploads";
 
 const app = express();
 
@@ -42,6 +46,30 @@ app.use("/api/v1/orders", orders);
 app.use("/api/v1/customers", customers);
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/admins", admins);
+
+app.post("/api/upload", uploadMiddleware, async (req, res) => {
+  // Handle the uploaded files
+  const files: any = req.files;
+
+  // Process and store the files as required
+  // For example, save the files to a specific directory using fs module
+  files.forEach((file: any) => {
+    const filePath = `${pathimg}/${file.filename}`;
+    fs.rename(file.path, filePath, (err: any) => {
+      if (err) {
+        // Handle error appropriately and send an error response
+        return res.status(500).json({ error: "Failed to store the file" });
+      }
+    });
+  });
+
+  // Send an appropriate response to the client
+  res.status(200).json({ message: "File upload successful" });
+});
+
+app.get("/images/:filename", function (request, response) {
+  response.sendFile(request.params.filename, { root: pathimg });
+});
 
 // 404 error if route not found
 app.all("*", (req, res, next) =>
