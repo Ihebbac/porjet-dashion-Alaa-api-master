@@ -407,33 +407,23 @@ export const createProduct = asyncHandler(async (req, res, next) => {
 export const updateProduct = asyncHandler(async (req, res, next) => {
   const id = parseInt(req.params.id);
 
-  let {
-    name,
-    price,
-    discountPercent,
-    description,
-    detail,
-    categoryId,
-    image1,
-    image2,
-    stock,
-  } = req.body;
+  let { name, description, detail, categoryId, option } = req.body;
 
   // Throws error if price field is not number
-  if (price) {
-    if (!parseFloat(price) || parseFloat(price) < 0) {
-      return next(new ErrorResponse(invalidPriceError, 400));
-    }
-    price = parseFloat(price);
-  }
+  // if (price) {
+  //   if (!parseFloat(price) || parseFloat(price) < 0) {
+  //     return next(new ErrorResponse(invalidPriceError, 400));
+  //   }
+  //   price = parseFloat(price);
+  // }
 
-  // Throws error if stock field is not integer
-  if (stock) {
-    if (!isIntegerAndPositive(stock)) {
-      return next(new ErrorResponse(invalidStockError, 400));
-    }
-    stock = parseInt(stock);
-  }
+  // // Throws error if stock field is not integer
+  // if (stock) {
+  //   if (!isIntegerAndPositive(stock)) {
+  //     return next(new ErrorResponse(invalidStockError, 400));
+  //   }
+  //   stock = parseInt(stock);
+  // }
 
   // Throws error if categoryId is invalid
   if (categoryId) {
@@ -446,9 +436,9 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     categoryId = parseInt(categoryId);
   }
 
-  if (discountPercent) {
-    discountPercent = parseFloat(discountPercent);
-  }
+  // if (discountPercent) {
+  //   discountPercent = parseFloat(discountPercent);
+  // }
 
   const existingProduct = await prisma.product.findUnique({
     where: { id },
@@ -468,6 +458,38 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
 
       updatedAt: new Date().toISOString(),
     },
+  });
+
+  option.forEach(async (options: any) => {
+    if (options.id) {
+      await prisma.proOptions.update({
+        where: { id: options.id },
+        data: {
+          color: options.colors,
+          images: options.images,
+          price: options.price,
+          size: options.sizes,
+          stock: options.stock,
+          product: {
+            connect: { id: id },
+          },
+        },
+      });
+    } else {
+      await prisma.proOptions.create({
+        data: {
+          // id, // only for testing
+          color: options.colors,
+          images: options.images,
+          price: options.price,
+          size: options.sizes,
+          stock: options.stock,
+          product: {
+            connect: { id: id },
+          },
+        },
+      });
+    }
   });
 
   res.status(200).json({
