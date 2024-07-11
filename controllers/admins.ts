@@ -72,7 +72,7 @@ export const createAdmin = asyncHandler(async (req, res, next) => {
  * @access  PUBLIC
  */
 export const loginAdmin = asyncHandler(async (req, res, next) => {
-  const email: string | undefined = req.body.email;
+ try{const email: string | undefined = req.body.email;
   const password: string | undefined = req.body.password;
 
   // Throws error if required fields not specify
@@ -103,7 +103,10 @@ export const loginAdmin = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     token,
-  });
+  });}catch (e) {
+console.log("rayen error", e)
+  }
+  
 });
 
 /**
