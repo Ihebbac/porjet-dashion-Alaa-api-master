@@ -17,20 +17,20 @@ const router = Router();
 
 router
   .route("/")
-  .get(adminOnly, authorize("SUPERADMIN"), getAdmins)
-  .post(adminOnly, authorize("SUPERADMIN"), createAdmin)
-  .put(adminOnly, updateAdminSelf);
+  .get( getAdmins)
+  .post( createAdmin)
+  .put(updateAdminSelf);
 
 router
-  .get("/me", adminOnly, getMe)
+  .get("/me", getMe)
   .post("/login", loginAdmin)
   .post("/seed", seedData)
-  .put("/change-password", adminOnly, changePassword);
+  .put("/change-password", changePassword);
 
 router
   .route("/:id")
-  .get(adminOnly, authorize("SUPERADMIN"), getAdmin)
-  .put(adminOnly, authorize("SUPERADMIN"), updateAdmin)
-  .delete(adminOnly, authorize("SUPERADMIN"), deleteAdmin);
+  .get( getAdmin)
+  .put( updateAdmin)
+  .delete( deleteAdmin);
 
 export default router;
