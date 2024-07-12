@@ -377,6 +377,7 @@ export const createProduct = asyncHandler(async (req, res, next) => {
           color: option.colors,
           images: option.images,
           price: option.price,
+          discount: option.discount,
           size: option.sizes,
           stock: option.stock,
           product: {
@@ -468,6 +469,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
           color: options.colors,
           images: options.images,
           price: options.price,
+          discount: options.discount,
           size: options.sizes,
           stock: options.stock,
           product: {
@@ -482,6 +484,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
           color: options.colors,
           images: options.images,
           price: options.price,
+          discount: options.discount,
           size: options.sizes,
           stock: options.stock,
           product: {
@@ -504,16 +507,24 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
  * @access  Private
  */
 export const deleteProduct = asyncHandler(async (req, res, next) => {
-  const id = parseInt(req.params.id);
+  try {
+    const id = parseInt(req.params.id);
 
-  await prisma.product.delete({
-    where: { id },
-  });
+    await prisma.product.delete({
+      where: { id },
+    });
 
-  res.status(204).json({
-    success: true,
-    data: [],
-  });
+    res.status(204).json({
+      success: true,
+      data: [],
+    });
+  } catch (error) {
+    console.log("eeeeeeeeeeeee", error);
+    res.status(500).json({
+      success: false,
+      data: [],
+    });
+  }
 });
 
 /*========================= Errors =============================*/
