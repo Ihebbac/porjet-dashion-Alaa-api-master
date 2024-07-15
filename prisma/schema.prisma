@@ -119,8 +119,8 @@ model Order {
 }
 
 enum DeliveryType {
-  STORE_PICKUP
-  YANGON
+  Point relais
+  livraison à domicile
   OTHERS
 }
 
