@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "proOptions" ALTER COLUMN "images" SET DATA TYPE VARCHAR(9999);
