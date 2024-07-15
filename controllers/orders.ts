@@ -30,10 +30,24 @@ import { Decimal } from "@prisma/client/runtime";
  */
 export const getOrders = asyncHandler(async (req, res, next) => {
   const orders = await prisma.order.findMany({
-    include: {
-      orders: true,
+    select: {
+      customer: true,
+      paymentType: true,
+      deliveryType: true,
+      totalPrice: true,
+      deliveryDate: true,
+      shippingAddress: true,
+      orderDate: true,
+      orders: {
+        select: {
+          product: true,
+          quantity: true,
+          orderNumber: true,
+        },
+      },
     },
   });
+
   res.status(200).json({
     success: true,
     count: orders.length,
@@ -51,8 +65,62 @@ export const getOrder = asyncHandler(async (req, res, next) => {
 
   const order = await prisma.order.findMany({
     where: { orderNumber: id },
-    include: {
-      orders: true,
+
+    select: {
+      customer: true,
+      paymentType: true,
+      deliveryType: true,
+      totalPrice: true,
+      deliveryDate: true,
+      shippingAddress: true,
+      orderDate: true,
+      orders: {
+        select: {
+          product: true,
+          quantity: true,
+          orderNumber: true,
+        },
+      },
+    },
+  });
+
+  if (order.length === 0) {
+    return next(new ErrorResponse(resource404Error("order"), 400));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: order,
+  });
+});
+
+
+/**
+ * Get specific order BY customer Id
+ * @route   GET /api/v1/orders/customer/id
+ * @access  Private (superadmin)
+ */
+export const getOrderbycustomer = asyncHandler(async (req, res, next) => {
+  const id = parseInt(req.params.id);
+
+  const order = await prisma.order.findMany({
+    where: { customerId: id },
+
+    select: {
+      customer: true,
+      paymentType: true,
+      deliveryType: true,
+      totalPrice: true,
+      deliveryDate: true,
+      shippingAddress: true,
+      orderDate: true,
+      orders: {
+        select: {
+          product: true,
+          quantity: true,
+          orderNumber: true,
+        },
+      },
     },
   });
 
@@ -68,16 +136,25 @@ export const getOrder = asyncHandler(async (req, res, next) => {
 
 /**
  * Get all orders details
- * @route   PATCH /api/v1/orders
- * @access  Testing purpose only
+ * @route   PATCH /api/v1/orders/orderDetails/all
+ * @access  Private (superadmin)
  */
 export const getOrderDetails = asyncHandler(async (req, res, next) => {
-  const orderDetails = await prisma.orderDetail.findMany();
-  res.status(200).json({
-    success: true,
-    count: orderDetails.length,
-    data: orderDetails,
-  });
+  try {
+    const orderDetails = await prisma.orderDetail.findMany();
+
+    res.status(200).json({
+      success: true,
+      count: orderDetails.length,
+      data: orderDetails,
+    });
+  } catch (error) {
+    res.status(200).json({
+      success: false,
+      count: 0,
+      data: [],
+    });
+  }
 });
 
 /**

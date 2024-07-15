@@ -3,6 +3,7 @@ import {
   createOrder,
   deleteOrder,
   getOrder,
+  getOrderbycustomer,
   getOrderDetails,
   getOrders,
 } from "../controllers/orders";
@@ -10,11 +11,11 @@ import { adminOnly } from "../middlewares/authHandler";
 
 const router = Router();
 
-router.route("/").get(adminOnly, getOrders).post(createOrder);
-
+router.route("/").get(getOrders).post(createOrder);
 // TESTing only
-router.route("/").patch(adminOnly, getOrderDetails);
+// router.route("/").patch(getOrderDetails);
+router.route("/customer/:id").get(getOrderbycustomer);
 
-router.route("/:id").get(adminOnly, getOrder).delete(adminOnly, deleteOrder);
+router.route("/:id").get(getOrder).delete(deleteOrder);
 
 export default router;

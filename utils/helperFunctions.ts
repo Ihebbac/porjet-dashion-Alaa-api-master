@@ -160,7 +160,7 @@ export const checkRole = (role: string) => {
  * @returns true | false
  */
 export const checkPaymentType = (paymentType: string) => {
-  const allowedPaymentTypes = ["CASH_ON_DELIVERY", "BANK_TRANSFER"];
+  const allowedPaymentTypes = ["CASH_ON_DELIVERY", "BANK_TRANSFER","OTHERS"];
   return allowedPaymentTypes.includes(paymentType) ? true : false;
 };
 
@@ -170,7 +170,7 @@ export const checkPaymentType = (paymentType: string) => {
  * @returns true | false
  */
 export const checkDeliveryType = (deliveryType: string) => {
-  const allowedDeliveryTypes = ["STORE_PICKUP", "YANGON", "OTHERS"];
+  const allowedDeliveryTypes = ["DOMICILE", "POINT_RELE", "OTHERS"];
   return allowedDeliveryTypes.includes(deliveryType) ? true : false;
 };
 
