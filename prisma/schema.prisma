@@ -119,14 +119,15 @@ model Order {
 }
 
 enum DeliveryType {
-  Point relais
-  livraison à domicile
+  DOMICILE
+  POINT_RELE
   OTHERS
 }
 
 enum PaymentType {
   CASH_ON_DELIVERY
   BANK_TRANSFER
+  OTHERS
 }
 
 model OrderDetail {
