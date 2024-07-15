@@ -22,6 +22,8 @@ import {
 import sendMail from "../utils/sendEmail";
 import emailTemplate from "../utils/emailTemplate";
 import { Decimal } from "@prisma/client/runtime";
+import { proOptions } from "./../db/data";
+import { ProOptions } from "@prisma/client";
 
 /**
  * Get all orders
@@ -40,7 +42,21 @@ export const getOrders = asyncHandler(async (req, res, next) => {
       orderDate: true,
       orders: {
         select: {
-          product: true,
+          proOptions: {
+            select: {
+              id: true,
+              color: true,
+              price: true,
+              size: true,
+              stock: true,
+              discount: true,
+              images: true,
+              productId: true,
+              product: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
           quantity: true,
           orderNumber: true,
         },
@@ -76,7 +92,21 @@ export const getOrder = asyncHandler(async (req, res, next) => {
       orderDate: true,
       orders: {
         select: {
-          product: true,
+          proOptions: {
+            select: {
+              id: true,
+              color: true,
+              price: true,
+              size: true,
+              stock: true,
+              discount: true,
+              images: true,
+              productId: true,
+              product: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
           quantity: true,
           orderNumber: true,
         },
@@ -93,7 +123,6 @@ export const getOrder = asyncHandler(async (req, res, next) => {
     data: order,
   });
 });
-
 
 /**
  * Get specific order BY customer Id
@@ -116,7 +145,21 @@ export const getOrderbycustomer = asyncHandler(async (req, res, next) => {
       orderDate: true,
       orders: {
         select: {
-          product: true,
+          proOptions: {
+            select: {
+              id: true,
+              color: true,
+              price: true,
+              size: true,
+              stock: true,
+              discount: true,
+              images: true,
+              productId: true,
+              product: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
           quantity: true,
           orderNumber: true,
         },
@@ -166,6 +209,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
   type Products = {
     id: number;
     quantity: number;
+    option: number;
   }[];
 
   const customerId: string | undefined = req.body.customerId;
@@ -232,13 +276,13 @@ export const createOrder = asyncHandler(async (req, res, next) => {
 
   type OrderDetailData = {
     orderNumber: number;
-    productId: number;
+    proOptionsId: number;
     quantity: number | undefined;
   }[];
 
-  const orderDetailData: OrderDetailData = products.map(({ id, quantity }) => ({
+  const orderDetailData: OrderDetailData = products.map(({ option, quantity }) => ({
     orderNumber: order.orderNumber,
-    productId: id,
+    proOptionsId: option,
     quantity: quantity,
   }));
 
@@ -247,58 +291,75 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     skipDuplicates: true,
   });
 
-  let createdOrderDetail: (OrderDetail & {
-    product: Product;
+  let createdOrderDetail: (any & {
+    proOptions: ProOptions;
   })[] = [];
   if (orderDetail) {
     createdOrderDetail = await prisma.orderDetail.findMany({
       where: {
         orderNumber: order.orderNumber,
       },
-      include: {
-        product: true,
+
+      select: {
+        quantity: true,
+        orderNumber: true,
+        proOptions: {
+          select: {
+            id: true,
+            color: true,
+            price: true,
+            size: true,
+            stock: true,
+            discount: true,
+            images: true,
+            productId: true,
+            product: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
       },
     });
   }
 
   // if order and orderDetail succeed
   // and sendEmail option is true
-  if (order && orderDetail && sendEmail) {
-    try {
-      // get purchased items in formatted array
-      const items = createdOrderDetail.map((orderItem) => ({
-        name: orderItem.product.name,
-        qty: orderItem.quantity,
-      }));
+  // if (order && orderDetail && sendEmail) {
+  //   try {
+  //     // get purchased items in formatted array
+  //     const items = createdOrderDetail.map((orderItem) => ({
+  //       name: orderItem.proOptions.color,
+  //       qty: orderItem.quantity,
+  //     }));
 
-      // invoke emailTemplate function and
-      // store returned html in message variable
-      const message = emailTemplate(
-        order.orderNumber,
-        order.totalPrice,
-        order.shippingAddress,
-        "" + deliveryDate,
-        items
-      );
+  //     // invoke emailTemplate function and
+  //     // store returned html in message variable
+  //     const message = emailTemplate(
+  //       order.orderNumber,
+  //       order.totalPrice,
+  //       order.shippingAddress,
+  //       "" + deliveryDate,
+  //       items
+  //     );
 
-      // send email to user
-      await sendMail({
-        email: order.customer.email,
-        subject: "Haru Fashion Order Received",
-        message,
-      });
-      res.status(201).json({
-        success: true,
-        data: order,
-        orderDetail: createdOrderDetail,
-      });
-    } catch (err) {
-      // Log error
-      console.error(err);
+  //     // send email to user
+  //     await sendMail({
+  //       email: order.customer.email,
+  //       subject: "Haru Fashion Order Received",
+  //       message,
+  //     });
+  //     res.status(201).json({
+  //       success: true,
+  //       data: order,
+  //       orderDetail: createdOrderDetail,
+  //     });
+  //   } catch (err) {
+  //     // Log error
+  //     console.error(err);
 
-      return next(new ErrorResponse(defaultError, 500));
-    }
-  }
+  //     return next(new ErrorResponse(defaultError, 500));
+  //   }
+  // }
 
   res.status(201).json({
     success: true,

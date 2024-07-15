@@ -52,7 +52,6 @@ model Product {
   categoryId         Int?         @map("category_id")
   createdAt          DateTime     @default(now()) @map("created_at")
   updatedAt          DateTime?    @map("updated_at")
-  product            OrderDetail[]
   tags               Tag[]
   ProOptions         ProOptions[] 
   @@map("products")
@@ -71,6 +70,7 @@ model ProOptions {
   productId        Int?         @map("product_id")
   createdAt        DateTime     @default(now()) @map("created_at")
   updatedAt        DateTime?    @map("updated_at")
+  order            OrderDetail[]
 
   @@map("proOptions")
 }
@@ -133,10 +133,10 @@ enum PaymentType {
 model OrderDetail {
   order         Order   @relation(fields: [orderNumber], references: [orderNumber], onDelete: Cascade)
   orderNumber   Int     
-  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId     Int
+  proOptions    ProOptions @relation(fields: [proOptionsId], references: [id], onDelete: Cascade)
+  proOptionsId  Int
   quantity      Int     @default(1)
 
-  @@id([orderNumber, productId])
+  @@id([orderNumber, proOptionsId])
   @@map("order_details")
 }
