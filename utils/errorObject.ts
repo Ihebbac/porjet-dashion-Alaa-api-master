@@ -68,7 +68,12 @@ export const unauthorizedError = errorObj(
 export const incorrectCredentialsError = {
   status: 401,
   type: errorTypes.unauthorized,
-  message: "email or password is incorrect",
+  message: "Votre email ou mot de passe est incorrect",
+};
+export const inactiveAccountError = {
+  status: 401,
+  type: errorTypes.unauthorized,
+  message: "Votre compte est suspendu",
 };
 
 /**
