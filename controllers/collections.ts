@@ -37,7 +37,7 @@ export const getcollections = asyncHandler(async (req, res, next) => {
   }
 
   // Find categories with Prisma Client
-  const categories = await prisma.category.findMany({
+  const categories = await prisma.collection.findMany({
     select,
     orderBy,
   });
@@ -48,7 +48,7 @@ export const getcollections = asyncHandler(async (req, res, next) => {
 });
 
 /**
- * Get specific category
+ * Get specific collection
  * @route   GET /api/v1/categories/:id
  * @access  Public
  */
@@ -62,24 +62,24 @@ export const getcollection = asyncHandler(async (req, res, next) => {
     select = selectedQuery(querySelect as string);
   }
 
-  const category = await prisma.category.findUnique({
+  const collection = await prisma.collection.findUnique({
     where: { id },
     select,
   });
 
-  // Throws an error if category does not exists
-  if (!category) {
-    return next(new ErrorResponse(resource404Error("category"), 404));
+  // Throws an error if collection does not exists
+  if (!collection) {
+    return next(new ErrorResponse(resource404Error("collection"), 404));
   }
 
   res.status(200).json({
     success: true,
-    data: category,
+    data: collection,
   });
 });
 
 /**
- * Create a new category
+ * Create a new collection
  * @route   POST /api/v1/categories
  * @access  Private (admin)
  */
@@ -97,8 +97,8 @@ export const createcollection = asyncHandler(async (req, res, next) => {
   // Trim the name and change it to lower-case
   name = (queryName as string).trim().toLowerCase();
 
-  // Create a category in prisma client
-  const category = await prisma.category.create({
+  // Create a collection in prisma client
+  const collection = await prisma.collection.create({
     data: {
       id: id as number,
       name: name as string,
@@ -110,21 +110,21 @@ export const createcollection = asyncHandler(async (req, res, next) => {
   res.status(201).json({
     success: true,
     location: `${req.protocol}://${req.get("host")}${req.baseUrl}/${
-      category.id
+      collection.id
     }`,
-    data: category,
+    data: collection,
   });
 });
 
 /**
- * Delete a category
+ * Delete a collection
  * @route   DELETE /api/v1/categories/:id
  * @access  Private (admin)
  */
 export const deletecollection = asyncHandler(async (req, res, next) => {
   const id = parseInt(req.params.id);
 
-  await prisma.category.delete({
+  await prisma.collection.delete({
     where: { id },
   });
 
@@ -135,7 +135,7 @@ export const deletecollection = asyncHandler(async (req, res, next) => {
 });
 
 /**
- * Update category
+ * Update collection
  * @route   PUT /api/v1/categories/:id
  * @access  Private
  */
@@ -145,7 +145,7 @@ export const updatecollection = asyncHandler(async (req, res, next) => {
   const description: string | undefined = req.body.description;
   const thumbnailImage: string | undefined = req.body.thumbnailImage;
 
-  const category = await prisma.category.update({
+  const collection = await prisma.collection.update({
     where: { id },
     data: {
       name,
@@ -157,6 +157,6 @@ export const updatecollection = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    data: category,
+    data: collection,
   });
 });

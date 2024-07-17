@@ -14,6 +14,7 @@ import customers from "./routers/customers";
 import admins from "./routers/admins";
 import auth from "./routers/auth";
 import orders from "./routers/orders";
+import collections from "./routers/collections";
 import uploadMiddleware from "./middlewares/multerMid";
 import fs from "fs";
 import Stripe from "stripe";
@@ -56,6 +57,7 @@ app.use("/api/v1/orders", orders);
 app.use("/api/v1/customers", customers);
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/admins", admins);
+app.use("/api/v1/collection", collections);
 
 app.post("/api/upload", uploadMiddleware, async (req, res) => {
   // Handle the uploaded files

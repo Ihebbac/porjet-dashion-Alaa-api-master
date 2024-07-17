@@ -1,4 +1,11 @@
-import { customers, categories, products, admins } from "./data";
+import {
+  customers,
+  categories,
+  products,
+  admins,
+  proOptions,
+  collections,
+} from "./data";
 import { PrismaClient } from "@prisma/client";
 
 let prisma = new PrismaClient({
@@ -21,6 +28,18 @@ async function main() {
   for (let product of products) {
     await prisma.product.create({
       data: product,
+    });
+  }
+
+  for (let proOption of proOptions) {
+    await prisma.proOptions.create({
+      data: proOption,
+    });
+  }
+
+  for (let collection of collections) {
+    await prisma.collection.create({
+      data: collection,
     });
   }
 
