@@ -140,6 +140,7 @@ export const products = [
     detail:
       "mattis nibh ligula nec sem duis aliquam convallis nunc proin at turpis a pede posuere nonummy integer non velit donec diam neque vestibulum eget vulputate ut ultrices vel augue vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae donec pharetra magna vestibulum",
     categoryId: 1,
+    collectionId: 1,
   },
 ];
 
