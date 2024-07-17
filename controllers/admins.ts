@@ -7,6 +7,7 @@ import {
   resource404Error,
   roleError,
   unauthorizedError,
+  inactiveAccountError,
 } from "../utils/errorObject";
 import ErrorResponse from "../utils/errorResponse";
 import { ExtendedRequest } from "../utils/extendedRequest";
@@ -88,6 +89,9 @@ export const loginAdmin = asyncHandler(async (req, res, next) => {
   if (!admin) {
     return next(new ErrorResponse(incorrectCredentialsError, 401));
   }
+  if (!admin.active) {
+    return next(new ErrorResponse(inactiveAccountError, 401));
+  }
 
   // Check pwd with hashed pwd stored in db
   const result = await comparePassword(password as string, admin.password);
@@ -104,7 +108,6 @@ export const loginAdmin = asyncHandler(async (req, res, next) => {
     success: true,
     token,
   });}catch (e) {
-console.log("rayen error", e)
   }
   
 });
