@@ -5,6 +5,7 @@ import {
   getOrder,
   getOrderbycustomer,
   getOrderDetails,
+  updateOrder,
   getOrders,
 } from "../controllers/orders";
 import { adminOnly } from "../middlewares/authHandler";
@@ -16,6 +17,9 @@ router.route("/").get(getOrders).post(createOrder);
 // router.route("/").patch(getOrderDetails);
 router.route("/customer/:id").get(getOrderbycustomer);
 
-router.route("/:id").get(getOrder).delete(deleteOrder);
+router.route("/:id")
+.get(getOrder)
+.delete(deleteOrder)
+.put(updateOrder);
 
 export default router;
