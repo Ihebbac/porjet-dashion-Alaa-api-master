@@ -41,6 +41,18 @@ model Category {
   @@map("categories")
 }
 
+model Collection {
+  id              Int        @id @default(autoincrement())
+  name            String     @db.Text @unique
+  description     String?    @db.Text
+  thumbnailImage  String?    @db.Text @map("thumbnail_image")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime?  @map("updated_at")
+  products        Product[]
+
+  @@map("collections")
+}
+
 
 
 model Product {
@@ -50,6 +62,10 @@ model Product {
   detail             String?      @db.Text
   category           Category?    @relation(fields: [categoryId], references: [id], onDelete: NoAction)
   categoryId         Int?         @map("category_id")
+
+  collection         Collection?  @relation(fields: [collectionId], references: [id], onDelete: NoAction)
+  collectionId       Int?         @map("collection_id")
+
   createdAt          DateTime     @default(now()) @map("created_at")
   updatedAt          DateTime?    @map("updated_at")
   tags               Tag[]
