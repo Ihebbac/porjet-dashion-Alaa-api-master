@@ -264,6 +264,40 @@ export const searchProducts = asyncHandler(async (req, res, next) => {
   });
 });
 
+export const searchProductsByCat = asyncHandler(async (req, res, next) => {
+  const id = parseInt(req.params.catId);
+
+  const products = await prisma.product.findMany({
+    where: {
+      categoryId: id,
+    },
+  });
+
+  res.status(200).json({
+    success: true,
+    count: products.length,
+    data: products,
+  });
+});
+
+export const searchProductsByCollection = asyncHandler(
+  async (req, res, next) => {
+    const id = parseInt(req.params.colId);
+
+    const products = await prisma.product.findMany({
+      where: {
+        collectionId: id,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
+  }
+);
+
 /**
  * Get specific products
  * @route   GET /api/v1/products/:id
