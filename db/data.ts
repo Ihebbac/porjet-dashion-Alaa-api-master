@@ -146,7 +146,7 @@ export const products = [
 
 export const proOptions = [
   {
-    color: "#cAcAca",
+    color: "#607d8b",
     price: 100,
     size: "M,L",
     stock: 23,

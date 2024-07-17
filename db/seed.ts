@@ -25,6 +25,12 @@ async function main() {
     });
   }
 
+  for (let collection of collections) {
+    await prisma.collection.create({
+      data: collection,
+    });
+  }
+
   for (let product of products) {
     await prisma.product.create({
       data: product,
@@ -34,12 +40,6 @@ async function main() {
   for (let proOption of proOptions) {
     await prisma.proOptions.create({
       data: proOption,
-    });
-  }
-
-  for (let collection of collections) {
-    await prisma.collection.create({
-      data: collection,
     });
   }
 
