@@ -108,6 +108,7 @@ model Order {
   city              String?       @db.VarChar(20)
   state             String?       @db.VarChar(20)
   zipCode           String?       @db.VarChar(20) @map("zip_code")
+  status            String?       @default("en attente")
   orderDate         DateTime      @db.Date @default(now()) @map("order_date")
   paymentType       PaymentType   @default(OTHERS) @map("payment_type")
   deliveryType      DeliveryType  @default(DOMICILE) @map("delivery_type")
@@ -136,6 +137,7 @@ model OrderDetail {
   proOptions    ProOptions @relation(fields: [proOptionsId], references: [id], onDelete: Cascade)
   proOptionsId  Int
   quantity      Int     @default(1)
+  size          String? @db.VarChar(40)
 
   @@id([orderNumber, proOptionsId])
   @@map("order_details")

@@ -40,6 +40,8 @@ export const getOrders = asyncHandler(async (req, res, next) => {
       deliveryDate: true,
       shippingAddress: true,
       orderDate: true,
+      orderNumber: true,
+      status: true,
       orders: {
         select: {
           proOptions: {
@@ -59,6 +61,7 @@ export const getOrders = asyncHandler(async (req, res, next) => {
           },
           quantity: true,
           orderNumber: true,
+          size: true,
         },
       },
     },
@@ -90,6 +93,8 @@ export const getOrder = asyncHandler(async (req, res, next) => {
       deliveryDate: true,
       shippingAddress: true,
       orderDate: true,
+      orderNumber: true,
+      status: true,
       orders: {
         select: {
           proOptions: {
@@ -109,6 +114,7 @@ export const getOrder = asyncHandler(async (req, res, next) => {
           },
           quantity: true,
           orderNumber: true,
+          size: true,
         },
       },
     },
@@ -117,6 +123,28 @@ export const getOrder = asyncHandler(async (req, res, next) => {
   if (order.length === 0) {
     return next(new ErrorResponse(resource404Error("order"), 400));
   }
+
+  res.status(200).json({
+    success: true,
+    data: order,
+  });
+});
+
+/**
+ * Get specific order
+ * @route   GET /api/v1/orders
+ * @access  Private (superadmin)
+ */
+export const updateOrder = asyncHandler(async (req, res, next) => {
+  const id = parseInt(req.params.id);
+  let status: string | undefined = req.body.status;
+
+  const order = await prisma.order.update({
+    where: { orderNumber: id },
+    data: {
+      status: status,
+    },
+  });
 
   res.status(200).json({
     success: true,
@@ -143,6 +171,8 @@ export const getOrderbycustomer = asyncHandler(async (req, res, next) => {
       deliveryDate: true,
       shippingAddress: true,
       orderDate: true,
+      orderNumber: true,
+      status: true,
       orders: {
         select: {
           proOptions: {
@@ -161,6 +191,7 @@ export const getOrderbycustomer = asyncHandler(async (req, res, next) => {
             },
           },
           quantity: true,
+          size: true,
           orderNumber: true,
         },
       },
@@ -210,6 +241,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     id: number;
     quantity: number;
     option: number;
+    size: string;
   }[];
 
   const customerId: string | undefined = req.body.customerId;
@@ -266,6 +298,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
       shippingAddress: shippingAddress as string,
       deliveryDate: deliveryDate,
       totalPrice: parseFloat(totalPrice as string),
+      status: "en attente",
       paymentType,
       deliveryType,
     },
@@ -278,12 +311,14 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     orderNumber: number;
     proOptionsId: number;
     quantity: number | undefined;
+    size: string;
   }[];
 
-  const orderDetailData: OrderDetailData = products.map(({ option, quantity }) => ({
+  const orderDetailData: OrderDetailData = products.map((e) => ({
     orderNumber: order.orderNumber,
-    proOptionsId: option,
-    quantity: quantity,
+    proOptionsId: e.option,
+    quantity: e.quantity,
+    size: e.size,
   }));
 
   const orderDetail = await prisma.orderDetail.createMany({
@@ -299,10 +334,10 @@ export const createOrder = asyncHandler(async (req, res, next) => {
       where: {
         orderNumber: order.orderNumber,
       },
-
       select: {
         quantity: true,
         orderNumber: true,
+        size: true,
         proOptions: {
           select: {
             id: true,
@@ -321,45 +356,6 @@ export const createOrder = asyncHandler(async (req, res, next) => {
       },
     });
   }
-
-  // if order and orderDetail succeed
-  // and sendEmail option is true
-  // if (order && orderDetail && sendEmail) {
-  //   try {
-  //     // get purchased items in formatted array
-  //     const items = createdOrderDetail.map((orderItem) => ({
-  //       name: orderItem.proOptions.color,
-  //       qty: orderItem.quantity,
-  //     }));
-
-  //     // invoke emailTemplate function and
-  //     // store returned html in message variable
-  //     const message = emailTemplate(
-  //       order.orderNumber,
-  //       order.totalPrice,
-  //       order.shippingAddress,
-  //       "" + deliveryDate,
-  //       items
-  //     );
-
-  //     // send email to user
-  //     await sendMail({
-  //       email: order.customer.email,
-  //       subject: "Haru Fashion Order Received",
-  //       message,
-  //     });
-  //     res.status(201).json({
-  //       success: true,
-  //       data: order,
-  //       orderDetail: createdOrderDetail,
-  //     });
-  //   } catch (err) {
-  //     // Log error
-  //     console.error(err);
-
-  //     return next(new ErrorResponse(defaultError, 500));
-  //   }
-  // }
 
   res.status(201).json({
     success: true,
