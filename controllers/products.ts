@@ -264,6 +264,40 @@ export const searchProducts = asyncHandler(async (req, res, next) => {
   });
 });
 
+export const searchProductsByCat = asyncHandler(async (req, res, next) => {
+  const id = parseInt(req.params.catId);
+
+  const products = await prisma.product.findMany({
+    where: {
+      categoryId: id,
+    },
+  });
+
+  res.status(200).json({
+    success: true,
+    count: products.length,
+    data: products,
+  });
+});
+
+export const searchProductsByCollection = asyncHandler(
+  async (req, res, next) => {
+    const id = parseInt(req.params.colId);
+
+    const products = await prisma.product.findMany({
+      where: {
+        collectionId: id,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
+  }
+);
+
 /**
  * Get specific products
  * @route   GET /api/v1/products/:id
@@ -318,7 +352,14 @@ export const createProduct = asyncHandler(async (req, res, next) => {
       categoryId: string | undefined;
     };
 
-    let { name, description, detail, categoryId, option: options } = req.body;
+    let {
+      name,
+      description,
+      detail,
+      categoryId,
+      collectionId,
+      option: options,
+    } = req.body;
 
     const requiredFields: RequiredFieldsType = {
       name,
@@ -354,6 +395,16 @@ export const createProduct = asyncHandler(async (req, res, next) => {
       categoryId = parseInt(categoryId);
     }
 
+    if (collectionId) {
+      const collection = await prisma.collection.findUnique({
+        where: { id: parseInt(collectionId) },
+      });
+      if (!collection) {
+        return next(new ErrorResponse(invalidCategoryError(collectionId), 400));
+      }
+      collectionId = parseInt(collectionId);
+    }
+
     // let id: any;
     // if (process.env.NODE_ENV === "testing") {
     //   id = parseInt(req.body.id);
@@ -367,6 +418,9 @@ export const createProduct = asyncHandler(async (req, res, next) => {
         detail,
         category: {
           connect: { id: categoryId },
+        },
+        collection: {
+          connect: { id: collectionId },
         },
       },
     });
@@ -408,7 +462,8 @@ export const createProduct = asyncHandler(async (req, res, next) => {
 export const updateProduct = asyncHandler(async (req, res, next) => {
   const id = parseInt(req.params.id);
 
-  let { name, description, detail, categoryId, option } = req.body;
+  let { name, description, detail, categoryId, collectionId, option } =
+    req.body;
 
   // Throws error if price field is not number
   // if (price) {
@@ -436,6 +491,15 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     }
     categoryId = parseInt(categoryId);
   }
+  if (collectionId) {
+    const category = await prisma.collection.findUnique({
+      where: { id: parseInt(collectionId) },
+    });
+    if (!category) {
+      return next(new ErrorResponse(invalidCategoryError(collectionId), 400));
+    }
+    collectionId = parseInt(collectionId);
+  }
 
   // if (discountPercent) {
   //   discountPercent = parseFloat(discountPercent);
@@ -454,6 +518,11 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
       category: {
         connect: {
           id: categoryId ? categoryId : existingProduct?.categoryId,
+        },
+      },
+      collection: {
+        connect: {
+          id: collectionId ? collectionId : existingProduct?.collectionId,
         },
       },
 

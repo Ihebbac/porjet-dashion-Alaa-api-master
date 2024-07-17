@@ -6,6 +6,8 @@ import {
   getProductCount,
   getProducts,
   searchProducts,
+  searchProductsByCat,
+  searchProductsByCollection,
   updateProduct,
 } from "../controllers/products";
 import { adminOnly } from "../middlewares/authHandler";
@@ -22,5 +24,8 @@ router
   .get("/:id", getProduct)
   .put("/:id", updateProduct)
   .delete("/:id", deleteProduct);
+
+router.get("/cat/:catId", searchProductsByCat);
+router.get("/col/:colId", searchProductsByCollection);
 
 export default router;
