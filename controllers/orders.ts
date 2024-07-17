@@ -30,7 +30,7 @@ import { ProOptions } from "@prisma/client";
  * @route   GET /api/v1/orders
  * @access  Private (superadmin)
  */
-export const getOrders = asyncHandler(async (req, res, next) => {
+export const getOrders = asyncHandler(async (_req, res, _next) => {
   const orders = await prisma.order.findMany({
     select: {
       customer: true,
@@ -135,7 +135,7 @@ export const getOrder = asyncHandler(async (req, res, next) => {
  * @route   GET /api/v1/orders
  * @access  Private (superadmin)
  */
-export const updateOrder = asyncHandler(async (req, res, next) => {
+export const updateOrder = asyncHandler(async (req, res, _next) => {
   const id = parseInt(req.params.id);
   let status: string | undefined = req.body.status;
 
@@ -213,7 +213,7 @@ export const getOrderbycustomer = asyncHandler(async (req, res, next) => {
  * @route   PATCH /api/v1/orders/orderDetails/all
  * @access  Private (superadmin)
  */
-export const getOrderDetails = asyncHandler(async (req, res, next) => {
+export const getOrderDetails = asyncHandler(async (_req, res, _next) => {
   try {
     const orderDetails = await prisma.orderDetail.findMany();
 
@@ -357,6 +357,30 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     });
   }
 
+  // update proOptions :
+  orderDetailData.forEach(async (elm) => {
+    let proOtion = await prisma.proOptions.findFirst({
+      where: {
+        id: elm.proOptionsId,
+      },
+    });
+
+    if (proOtion) {
+      let OldStock = Number(proOtion?.stock);
+
+      if (OldStock > 0) {
+        await prisma.proOptions.update({
+          where: {
+            id: elm.proOptionsId,
+          },
+          data: {
+            stock: OldStock - Number(elm.quantity),
+          },
+        });
+      }
+    }
+  });
+
   res.status(201).json({
     success: true,
     data: order,
@@ -369,7 +393,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
  * @route   DELETE /api/v1/orders/:id
  * @access  Private (admin)
  */
-export const deleteOrder = asyncHandler(async (req, res, next) => {
+export const deleteOrder = asyncHandler(async (req, res, _next) => {
   const id = parseInt(req.params.id);
 
   await prisma.order.delete({
