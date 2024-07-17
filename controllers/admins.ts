@@ -280,11 +280,11 @@ export const getAdmin = asyncHandler(async (req, res, next) => {
  * @access  Private (superadmin)
  */
 export const updateAdmin = asyncHandler(async (req, res, next) => {
-  const id = parseInt(req.params.id);
+ try { const id = parseInt(req.params.id);
 
   const username = req.body.username;
   const email = req.body.email;
-  const password = req.body.password;
+  // const password = req.body.password;
   const role = req.body.role;
   const active = req.body.active;
   let hashedPassword: string | undefined;
@@ -295,25 +295,28 @@ export const updateAdmin = asyncHandler(async (req, res, next) => {
   }
 
   // Hash plain text password
-  if (password) {
-    hashedPassword = await hashPassword(password);
-  }
+  // if (password) {
+  //   hashedPassword = await hashPassword(password);
+  // }
 
   const admin = await prisma.admin.update({
     where: { id },
     data: {
       username,
       email,
-      password: hashedPassword,
+      // password: hashedPassword,
       role,
       active,
       updatedAt: new Date().toISOString(),
     },
   });
-
+}catch (e) {
+  console.log("eeeeee", e)
+}
+ 
   res.status(200).json({
     success: true,
-    data: { ...admin, password },
+    data: {  },
   });
 });
 
