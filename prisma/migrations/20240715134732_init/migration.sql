@@ -16,4 +16,4 @@ ADD COLUMN     "proOptionsId" INTEGER NOT NULL,
 ADD CONSTRAINT "order_details_pkey" PRIMARY KEY ("orderNumber", "proOptionsId");
 
 -- AddForeignKey
-ALTER TABLE "order_details" ADD CONSTRAINT "order_details_proOptionsId_fkey" FOREIGN KEY ("proOptionsId") REFERENCES "proOptions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "order_details" ADD CONSTRAINT "order_details_proOptionsId_fkey" FOREIGN KEY ("proOptionsId") REFERENCES "prooptions"("id") ON DELETE CASCADE ON UPDATE CASCADE;

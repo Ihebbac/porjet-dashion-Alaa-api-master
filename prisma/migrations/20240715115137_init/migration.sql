@@ -47,7 +47,7 @@ CREATE TABLE "products" (
 );
 
 -- CreateTable
-CREATE TABLE "proOptions" (
+CREATE TABLE "prooptions" (
     "id" SERIAL NOT NULL,
     "color" TEXT NOT NULL,
     "price" DECIMAL(7,2) NOT NULL,
@@ -141,7 +141,7 @@ CREATE INDEX "_ProductToTag_B_index" ON "_ProductToTag"("B");
 ALTER TABLE "products" ADD CONSTRAINT "products_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "proOptions" ADD CONSTRAINT "proOptions_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "prooptions" ADD CONSTRAINT "proOptions_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "orders" ADD CONSTRAINT "orders_customer_id_fkey" FOREIGN KEY ("customer_id") REFERENCES "customers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

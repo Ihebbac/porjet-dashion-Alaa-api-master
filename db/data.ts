@@ -144,7 +144,7 @@ export const products = [
   },
 ];
 
-export const proOptions = [
+export const prooptions = [
   {
     color: "#607d8b",
     price: 100,

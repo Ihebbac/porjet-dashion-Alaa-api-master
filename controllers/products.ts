@@ -187,14 +187,14 @@ export const getProducts = asyncHandler(async (req, res, next) => {
     // include: { category: true },
   });
 
-  const proOptions = await prisma.proOptions.findMany();
+  const prooptions = await prisma.prooptions.findMany();
 
   res.status(200).json({
     success: true,
     count: products.length,
     data: products.map((el: any) => ({
       ...el,
-      option: proOptions.filter((elm) => elm?.productId === el?.id),
+      option: prooptions.filter((elm) => elm?.productId === el?.id),
     })),
   });
 });
@@ -328,13 +328,13 @@ export const getProduct = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(resource404Error("product"), 404));
   }
 
-  const proOptions = await prisma.proOptions.findMany();
+  const prooptions = await prisma.prooptions.findMany();
 
   res.status(200).json({
     success: true,
     data: {
       ...product,
-      option: proOptions.filter((elm) => elm.productId === product.id),
+      option: prooptions.filter((elm) => elm.productId === product.id),
     },
   });
 });
@@ -425,7 +425,7 @@ export const createProduct = asyncHandler(async (req, res, next) => {
       },
     });
     options.forEach(async (option: any) => {
-      await prisma.proOptions.create({
+      await prisma.prooptions.create({
         data: {
           // id, // only for testing
           color: option.colors,
@@ -532,7 +532,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
 
   option.forEach(async (options: any) => {
     if (options.id) {
-      await prisma.proOptions.update({
+      await prisma.prooptions.update({
         where: { id: options.id },
         data: {
           color: options.colors,
@@ -547,7 +547,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
         },
       });
     } else {
-      await prisma.proOptions.create({
+      await prisma.prooptions.create({
         data: {
           // id, // only for testing
           color: options.colors,

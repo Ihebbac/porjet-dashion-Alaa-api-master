@@ -3,7 +3,7 @@ import {
   categories,
   products,
   admins,
-  proOptions,
+  prooptions,
   collections,
 } from "./data";
 import { PrismaClient } from "@prisma/client";
@@ -37,8 +37,8 @@ async function main() {
     });
   }
 
-  for (let proOption of proOptions) {
-    await prisma.proOptions.create({
+  for (let proOption of prooptions) {
+    await prisma.prooptions.create({
       data: proOption,
     });
   }

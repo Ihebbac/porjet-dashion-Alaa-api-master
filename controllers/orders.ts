@@ -22,7 +22,7 @@ import {
 import sendMail from "../utils/sendEmail";
 import emailTemplate from "../utils/emailTemplate";
 import { Decimal } from "@prisma/client/runtime";
-import { proOptions } from "./../db/data";
+import { prooptions } from "./../db/data";
 import { ProOptions } from "@prisma/client";
 
 /**
@@ -44,7 +44,7 @@ export const getOrders = asyncHandler(async (_req, res, _next) => {
       status: true,
       orders: {
         select: {
-          proOptions: {
+          prooptions: {
             select: {
               id: true,
               color: true,
@@ -97,7 +97,7 @@ export const getOrder = asyncHandler(async (req, res, next) => {
       status: true,
       orders: {
         select: {
-          proOptions: {
+          prooptions: {
             select: {
               id: true,
               color: true,
@@ -175,7 +175,7 @@ export const getOrderbycustomer = asyncHandler(async (req, res, next) => {
       status: true,
       orders: {
         select: {
-          proOptions: {
+          prooptions: {
             select: {
               id: true,
               color: true,
@@ -327,7 +327,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
   });
 
   let createdOrderDetail: (any & {
-    proOptions: ProOptions;
+    prooptions: ProOptions;
   })[] = [];
   if (orderDetail) {
     createdOrderDetail = await prisma.orderDetail.findMany({
@@ -338,7 +338,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
         quantity: true,
         orderNumber: true,
         size: true,
-        proOptions: {
+        prooptions: {
           select: {
             id: true,
             color: true,
@@ -357,9 +357,9 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     });
   }
 
-  // update proOptions :
+  // update prooptions :
   orderDetailData.forEach(async (elm) => {
-    let proOtion = await prisma.proOptions.findFirst({
+    let proOtion = await prisma.prooptions.findFirst({
       where: {
         id: elm.proOptionsId,
       },
@@ -369,7 +369,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
       let OldStock = Number(proOtion?.stock);
 
       if (OldStock > 0) {
-        await prisma.proOptions.update({
+        await prisma.prooptions.update({
           where: {
             id: elm.proOptionsId,
           },

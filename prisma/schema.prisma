@@ -69,12 +69,12 @@ model Product {
   createdAt          DateTime     @default(now()) @map("created_at")
   updatedAt          DateTime?    @map("updated_at")
   tags               Tag[]
-  ProOptions         ProOptions[] 
+  Prooptions         Prooptions[] 
   @@map("products")
 }
 
 
-model ProOptions {
+model Prooptions {
   id               Int          @id @default(autoincrement())
   color            String       @db.Text
   price            Decimal      @db.Decimal(7, 2)
@@ -88,7 +88,7 @@ model ProOptions {
   updatedAt        DateTime?    @map("updated_at")
   order            OrderDetail[]
 
-  @@map("proOptions")
+  @@map("prooptions")
 }
 
 model Tag {
@@ -150,11 +150,11 @@ enum PaymentType {
 model OrderDetail {
   order         Order   @relation(fields: [orderNumber], references: [orderNumber], onDelete: Cascade)
   orderNumber   Int     
-  proOptions    ProOptions @relation(fields: [proOptionsId], references: [id], onDelete: Cascade)
-  proOptionsId  Int
+  prooptions    Prooptions @relation(fields: [prooptionsId], references: [id], onDelete: Cascade)
+  prooptionsId  Int
   quantity      Int     @default(1)
   size          String? @db.VarChar(40)
 
-  @@id([orderNumber, proOptionsId])
+  @@id([orderNumber, prooptionsId])
   @@map("order_details")
 }
