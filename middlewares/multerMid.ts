@@ -29,7 +29,7 @@ const uploadMiddleware = (req: any, res: any, next: any) => {
 
     // Validate file types and sizes
     files.forEach((file: any) => {
-      const allowedTypes = ["image/jpeg", "image/png"];
+      const allowedTypes = ["image/jpeg", "image/png","image/webp"];
       const maxSize = 100 * 1024 * 1024; // 5MB
 
       if (!allowedTypes.includes(file.mimetype)) {

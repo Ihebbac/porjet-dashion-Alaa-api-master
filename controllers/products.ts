@@ -11,12 +11,7 @@ import {
 } from "../utils/helperFunctions";
 import { Prisma } from ".prisma/client";
 import ErrorResponse from "../utils/errorResponse";
-import errorObj, {
-  errObjType,
-  errorTypes,
-  invalidQuery,
-  resource404Error,
-} from "../utils/errorObject";
+import errorObj, { errObjType, errorTypes, invalidQuery, resource404Error } from "../utils/errorObject";
 
 /**
  * Get all products
@@ -38,9 +33,7 @@ export const getProducts = asyncHandler(async (req, res, next) => {
 
   // init variables
   let select: Prisma.ProductSelect | ProductSelectType | undefined;
-  let orderBy:
-    | Prisma.Enumerable<Prisma.ProductOrderByWithRelationInput>
-    | undefined;
+  let orderBy: Prisma.Enumerable<Prisma.ProductOrderByWithRelationInput> | undefined;
   let skip: number | undefined;
   let take: number | undefined;
   let price: FilteredType[] = [];
@@ -246,7 +239,7 @@ export const searchProducts = asyncHandler(async (req, res, next) => {
 
   if (querySearch) {
     search = (querySearch as string).replace(" ", "|");
-    searchObj = { search: search, mode: "insensitive" };
+    searchObj = { contains: search, mode: "insensitive" };
   }
 
   const products = await prisma.product.findMany({
@@ -256,11 +249,15 @@ export const searchProducts = asyncHandler(async (req, res, next) => {
       detail: searchObj,
     },
   });
+  const prooptions = await prisma.prooptions.findMany();
 
   res.status(200).json({
     success: true,
     count: products.length,
-    data: products,
+    data: products.map((el: any) => ({
+      ...el,
+      option: prooptions.filter((elm) => elm?.productId === el?.id),
+    })),
   });
 });
 
@@ -272,31 +269,37 @@ export const searchProductsByCat = asyncHandler(async (req, res, next) => {
       categoryId: id,
     },
   });
+  const prooptions = await prisma.prooptions.findMany();
 
   res.status(200).json({
     success: true,
     count: products.length,
-    data: products,
+    data: products.map((el: any) => ({
+      ...el,
+      option: prooptions.filter((elm) => elm?.productId === el?.id),
+    })),
   });
 });
 
-export const searchProductsByCollection = asyncHandler(
-  async (req, res, next) => {
-    const id = parseInt(req.params.colId);
+export const searchProductsByCollection = asyncHandler(async (req, res, next) => {
+  const id = parseInt(req.params.colId);
 
-    const products = await prisma.product.findMany({
-      where: {
-        collectionId: id,
-      },
-    });
+  const products = await prisma.product.findMany({
+    where: {
+      collectionId: id,
+    },
+  });
+  const prooptions = await prisma.prooptions.findMany();
 
-    res.status(200).json({
-      success: true,
-      count: products.length,
-      data: products,
-    });
-  }
-);
+  res.status(200).json({
+    success: true,
+    count: products.length,
+    data: products.map((el: any) => ({
+      ...el,
+      option: prooptions.filter((elm) => elm?.productId === el?.id),
+    })),
+  });
+});
 
 /**
  * Get specific products
@@ -352,14 +355,7 @@ export const createProduct = asyncHandler(async (req, res, next) => {
       categoryId: string | undefined;
     };
 
-    let {
-      name,
-      description,
-      detail,
-      categoryId,
-      collectionId,
-      option: options,
-    } = req.body;
+    let { name, description, detail, categoryId, collectionId, option: options } = req.body;
 
     const requiredFields: RequiredFieldsType = {
       name,
@@ -462,8 +458,7 @@ export const createProduct = asyncHandler(async (req, res, next) => {
 export const updateProduct = asyncHandler(async (req, res, next) => {
   const id = parseInt(req.params.id);
 
-  let { name, description, detail, categoryId, collectionId, option } =
-    req.body;
+  let { name, description, detail, categoryId, collectionId, option } = req.body;
 
   // Throws error if price field is not number
   // if (price) {
@@ -597,29 +592,19 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
 });
 
 /*========================= Errors =============================*/
-const invalidPriceError = errorObj(
-  400,
-  errorTypes.invalidArgument,
-  "invalid price field",
-  [
-    {
-      code: "invalidPrice",
-      message: `price field must only be valid number`,
-    },
-  ]
-);
+const invalidPriceError = errorObj(400, errorTypes.invalidArgument, "invalid price field", [
+  {
+    code: "invalidPrice",
+    message: `price field must only be valid number`,
+  },
+]);
 
-const invalidStockError = errorObj(
-  400,
-  errorTypes.invalidArgument,
-  "invalid stock field",
-  [
-    {
-      code: "invalidStock",
-      message: `stock field must only be valid integer`,
-    },
-  ]
-);
+const invalidStockError = errorObj(400, errorTypes.invalidArgument, "invalid stock field", [
+  {
+    code: "invalidStock",
+    message: `stock field must only be valid integer`,
+  },
+]);
 
 const invalidCategoryError = (categoryId: string) =>
   errorObj(400, errorTypes.invalidArgument, "invalid category id", [
