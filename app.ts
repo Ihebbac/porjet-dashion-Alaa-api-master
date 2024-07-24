@@ -93,8 +93,16 @@ app.get("/api/v1/config", (req, res) => {
 app.post("/api/v1/create-payment-intent", async (req, res) => {
   try {
     const totalPrice: string | undefined = req.body.totalPrice;
+    const email: string | undefined = req.body.email;
+    const name: string | undefined = req.body.name;
+
+    const customer = await stripe.customers.create({
+      email: email,
+      name: name,
+    });
 
     const paymentIntent = await stripe.paymentIntents.create({
+      customer: customer.id,
       currency: "EUR",
       amount: Number(totalPrice) * 100 ?? 1,
       automatic_payment_methods: { enabled: true },
