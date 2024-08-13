@@ -315,10 +315,10 @@ export const createOrder = asyncHandler(async (req, res, next) => {
   }[];
 
   const orderDetailData: OrderDetailData = products.map((e) => ({
-    orderNumber: order.orderNumber,
-    prooptionsId: e.option,
-    quantity: e.quantity,
-    size: e.size,
+    orderNumber: order?.orderNumber,
+    prooptionsId: e?.option,
+    quantity: e?.quantity,
+    size: e?.size,
   }));
 
   const orderDetail = await prisma.orderDetail.createMany({

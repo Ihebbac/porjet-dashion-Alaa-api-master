@@ -41,7 +41,11 @@ export const registerCustomer = asyncHandler(async (req, res, next) => {
 
     // Validate email
     if (!validateEmail(email)) {
-      const emailError = errorObj(400, errorTypes.invalidArgument, "email is not valid");
+      const emailError = errorObj(
+        400,
+        errorTypes.invalidArgument,
+        "email is not valid"
+      );
       return next(new ErrorResponse(emailError, 400));
     }
 
@@ -66,7 +70,15 @@ export const registerCustomer = asyncHandler(async (req, res, next) => {
       token: token,
     });
   } catch (er) {
-    console.log("errror", er);
+    res.status(400).json({
+      success: false,
+      error:{
+        type : "alreadyExists",
+        detail : {
+          message : "Email already Exists !"
+        }
+      },
+    });
   }
 });
 
@@ -144,83 +156,90 @@ export const getMe = asyncHandler(async (req: ExtendedRequest, res, next) => {
  * @route   PUT /api/v1/auth/update-details
  * @access  Private
  */
-export const updateCustomerSelf = asyncHandler(async (req: ExtendedRequest, res, next) => {
-  const fullname: string | undefined = req.body.fullname;
-  const shippingAddress: string | undefined = req.body.shippingAddress;
-  const phone: string | undefined = req.body.phone;
-  const email: string | undefined = req.body.email;
+export const updateCustomerSelf = asyncHandler(
+  async (req: ExtendedRequest, res, next) => {
+    const fullname: string | undefined = req.body.fullname;
+    const shippingAddress: string | undefined = req.body.shippingAddress;
+    const phone: string | undefined = req.body.phone;
+    const email: string | undefined = req.body.email;
 
-  // Throws error if email is invalid
-  if (email && !validateEmail(email)) {
-    return next(new ErrorResponse(invalidEmail, 400));
+    // Throws error if email is invalid
+    if (email && !validateEmail(email)) {
+      return next(new ErrorResponse(invalidEmail, 400));
+    }
+
+    const updatedCustomer = await prisma.customer.update({
+      where: { id: req!.user!.id },
+      data: {
+        fullname,
+        email,
+        shippingAddress,
+        phone,
+        updatedAt: new Date().toISOString(),
+      },
+      select: {
+        fullname: true,
+        email: true,
+        shippingAddress: true,
+        phone: true,
+        updatedAt: true,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: updatedCustomer,
+    });
   }
-
-  const updatedCustomer = await prisma.customer.update({
-    where: { id: req!.user!.id },
-    data: {
-      fullname,
-      email,
-      shippingAddress,
-      phone,
-      updatedAt: new Date().toISOString(),
-    },
-    select: {
-      fullname: true,
-      email: true,
-      shippingAddress: true,
-      phone: true,
-      updatedAt: true,
-    },
-  });
-
-  res.status(200).json({
-    success: true,
-    data: updatedCustomer,
-  });
-});
+);
 
 /**
  * Update Customer Password (self)
  * @route   PUT /api/v1/auth/change-password
  * @access  Private
  */
-export const changePassword = asyncHandler(async (req: ExtendedRequest, res, next) => {
-  const currentPassword = req.body.currentPassword;
-  const newPassword = req.body.newPassword;
+export const changePassword = asyncHandler(
+  async (req: ExtendedRequest, res, next) => {
+    const currentPassword = req.body.currentPassword;
+    const newPassword = req.body.newPassword;
 
-  // Check required fields
-  const requiredFields = { currentPassword, newPassword };
-  const hasError = checkRequiredFields(requiredFields, next);
-  if (hasError !== false) return hasError;
+    // Check required fields
+    const requiredFields = { currentPassword, newPassword };
+    const hasError = checkRequiredFields(requiredFields, next);
+    if (hasError !== false) return hasError;
 
-  // Check current password is correct
-  const correctPassword = await comparePassword(currentPassword, req!.user!.password);
-
-  // Throws error if current password is incorrect
-  if (!correctPassword)
-    return next(
-      new ErrorResponse(
-        {
-          ...incorrectCredentialsError,
-          message: "current password is incorrect",
-        },
-        401
-      )
+    // Check current password is correct
+    const correctPassword = await comparePassword(
+      currentPassword,
+      req!.user!.password
     );
 
-  // Hash new password
-  const hashedPassword = await hashPassword(newPassword);
+    // Throws error if current password is incorrect
+    if (!correctPassword)
+      return next(
+        new ErrorResponse(
+          {
+            ...incorrectCredentialsError,
+            message: "current password is incorrect",
+          },
+          401
+        )
+      );
 
-  await prisma.customer.update({
-    where: { id: req!.user!.id },
-    data: { password: hashedPassword },
-  });
+    // Hash new password
+    const hashedPassword = await hashPassword(newPassword);
 
-  res.status(200).json({
-    success: true,
-    message: "password has been updated",
-  });
-});
+    await prisma.customer.update({
+      where: { id: req!.user!.id },
+      data: { password: hashedPassword },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "password has been updated",
+    });
+  }
+);
 
 /**
  * Forgot Password
@@ -246,7 +265,9 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
   });
 
   // Create reset URL
-  const resetURL = `${req.protocol}://${req.get("host")}/api/v1/auth/reset-password/${resetToken}`;
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/auth/reset-password/${resetToken}`;
 
   // Reset email message
   const message = `You are receiving this email because 
@@ -293,7 +314,10 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
   const hasError = checkRequiredFields({ password }, next);
   if (hasError !== false) return hasError;
 
-  const resetPwdToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+  const resetPwdToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
 
   const customer = await prisma.customer.findUnique({
     where: { resetPwdToken },
